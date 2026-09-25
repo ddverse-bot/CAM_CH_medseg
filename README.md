@@ -10,25 +10,29 @@ The framework integrates:
 - **Average Calibration Error (ACE)** loss for prediction calibration
 
 ## Architectures
+<img width="1313" height="800" alt="image" src="https://github.com/user-attachments/assets/4da27f58-6067-40ac-9fb8-7c02b0627f08" />
+
+
+The framework is evaluated using:
 
 - U-Net
 - U-Net++
 - Attention U-Net
-<img width="1313" height="800" alt="image" src="https://github.com/user-attachments/assets/1de732db-e00e-4d0f-a72c-beddaa1b0ef6" />
-
 
 ## Datasets
+
+Experiments are conducted on four publicly available medical imaging datasets:
 
 - ACDC
 - COVID-19 CT
 - BUSI
 - PU2756 Pulmonary Ultrasound
 
-All datasets are formulated as **binary segmentation** tasks with images resized to **256 × 256** and normalized to **[0, 1]**.
+All datasets are formulated as **binary segmentation** tasks. Images are resized to **256 × 256** and normalized to **[0, 1]**.
 
 ## Framework
 
-### Segmentation
+### 1. Segmentation
 
 The segmentation network produces a pixel-wise prediction:
 
@@ -46,9 +50,11 @@ $$
 \frac{1}{2}\mathcal{L}_{BCE}
 $$
 
-### Classification Head
+### 2. Classification Head
 
-The Classification Head (CH) is attached to the encoder bottleneck to provide image-level supervision:
+The Classification Head (CH) is attached to the encoder bottleneck to provide additional image-level supervision and strengthen the learned feature representation.
+
+The classification loss is:
 
 $$
 \mathcal{L}_{cls}
@@ -58,16 +64,21 @@ $$
 
 where $c$ represents the image-level target derived from the segmentation mask.
 
-### Class Activation Mapping
+### 3. Class Activation Mapping
 
-Class Activation Mapping (CAM) provides spatial information about the regions contributing to the classification prediction. It uses the deep encoder features and classification weights to provide additional spatial guidance to the segmentation network.
+Class Activation Mapping (CAM) provides spatial information about the regions contributing to the classification prediction.
 
-### Anatomy-Aware Uncertainty
+CAM is generated from the deep encoder features and classification weights, providing additional spatial guidance to the segmentation network.
 
-Anatomical priors are used to estimate spatial prediction uncertainty:
+### 4. Anatomy-Aware Uncertainty
+
+Anatomical priors are used to estimate spatial prediction uncertainty.
+
+The uncertainty map is defined as:
 
 $$
-U =
+U
+=
 \frac{1}{M}
 \sum_{i=1}^{M}
 w_i
@@ -76,21 +87,31 @@ w_i
 \right|
 $$
 
-where $\bar{y}_i$ represents the retrieved anatomical prior segmentations, $y^*$ is the predicted segmentation, and $w_i$ is the similarity-based weight of each prior.
+where:
 
-Higher uncertainty indicates greater disagreement between the prediction and anatomically plausible segmentations.
+- $\bar{y}_i$ represents the retrieved anatomical prior segmentations.
+- $y^*$ represents the predicted segmentation.
+- $w_i$ represents the similarity-based weight assigned to the $i$-th anatomical prior.
+- $M$ is the number of retrieved anatomical priors.
 
-### Average Calibration Error
+Higher uncertainty indicates greater disagreement between the predicted segmentation and anatomically plausible segmentations.
 
-ACE measures the difference between predicted confidence and observed accuracy:
+### 5. Average Calibration Error
+
+Average Calibration Error (ACE) measures the difference between predicted confidence and observed accuracy:
 
 $$
-ACE =
+ACE
+=
 \frac{1}{CM}
 \sum_{c=1}^{C}
 \sum_{m=1}^{M}
-|o_{cm}-e_{cm}|
+\left|
+o_{cm}-e_{cm}
+\right|
 $$
+
+where $o_{cm}$ represents the observed accuracy and $e_{cm}$ represents the expected confidence for class $c$ and confidence bin $m$.
 
 The regional calibration loss is:
 
@@ -99,7 +120,9 @@ $$
 =
 \frac{1}{N}
 \sum_{i=1}^{N}
-|u_i-e_i|
+\left|
+u_i-e_i
+\right|
 $$
 
 where $u_i$ is the predicted uncertainty and $e_i$ is the corresponding segmentation error.
@@ -123,8 +146,10 @@ $$
 The experimental loss weights are:
 
 $$
-\lambda_{cls}=0.2,\qquad
-\lambda_{CAM}=0.3,\qquad
+\lambda_{cls}=0.2,
+\qquad
+\lambda_{CAM}=0.3,
+\qquad
 \lambda_{ACE}=0.5
 $$
 
@@ -132,7 +157,7 @@ Different ablation configurations selectively add or remove **CH, CAM, and ACE**
 
 ## Evaluation
 
-The framework evaluates segmentation using:
+The framework evaluates segmentation performance using:
 
 - Dice
 - IoU
@@ -140,11 +165,49 @@ The framework evaluates segmentation using:
 - Recall
 - F1-score
 
-It also evaluates prediction uncertainty and its correlation with segmentation errors.
+Uncertainty is evaluated using the magnitude of the spatial uncertainty and its correlation with segmentation errors.
 
-Qualitative outputs include:
+Qualitative analysis includes:
 
-- Segmentation masks
-- CAM maps
+- Segmentation predictions
+- Class Activation Maps
 - Uncertainty maps
 
+## Project Structure
+
+```text
+CAM_CH_medseg/
+├── models/
+│   ├── unet.py
+│   ├── unetplusplus.py
+│   ├── attunet.py
+│   └── classification_head.py
+│
+├── losses/
+│   ├── segmentation_loss.py
+│   ├── classification_loss.py
+│   ├── cam_loss.py
+│   ├── ace_loss.py
+│   └── total_loss.py
+│
+├── datasets/
+│   ├── busi.py
+│   ├── acdc.py
+│   ├── pulmonary.py
+│   └── covid.py
+│
+├── uncertainty/
+│   └── anatomical_prior.py
+│
+├── configs/
+│   ├── busi.yaml
+│   ├── acdc.yaml
+│   ├── pulmonary.yaml
+│   └── covid.yaml
+│
+├── train.py
+├── evaluate.py
+├── make_visuals.py
+├── run_all.py
+├── requirements.txt
+└── README.md
