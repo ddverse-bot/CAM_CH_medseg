@@ -1,4 +1,4 @@
-# Uncertainty Aware Deep Learning Framework for Classification-Guided Medical Image Segmentation
+# Uncertainty-Aware Deep Learning Framework for Classification-Guided Medical Image Segmentation
 
 PyTorch implementation of a unified framework for **medical image segmentation, explainability, and uncertainty estimation**.
 
@@ -9,9 +9,11 @@ The framework integrates:
 - **Anatomy-aware uncertainty estimation**
 - **Average Calibration Error (ACE)** loss for prediction calibration
 
-## Architectures
-<img width="1313" height="800" alt="image" src="https://github.com/user-attachments/assets/4da27f58-6067-40ac-9fb8-7c02b0627f08" />
+---
 
+## Architectures
+
+<img width="1313" height="800" alt="Framework architecture diagram" src="https://github.com/user-attachments/assets/4da27f58-6067-40ac-9fb8-7c02b0627f08" />
 
 The framework is evaluated using:
 
@@ -19,16 +21,22 @@ The framework is evaluated using:
 - U-Net++
 - Attention U-Net
 
+---
+
 ## Datasets
 
 Experiments are conducted on four publicly available medical imaging datasets:
 
-- ACDC
-- COVID-19 CT
-- BUSI
-- PU2756 Pulmonary Ultrasound
+| Dataset | Modality |
+|---|---|
+| ACDC | Cardiac MRI |
+| COVID-19 CT | Chest CT |
+| BUSI | Breast Ultrasound |
+| PU2756 | Pulmonary Ultrasound |
 
 All datasets are formulated as **binary segmentation** tasks. Images are resized to **256 × 256** and normalized to **[0, 1]**.
+
+---
 
 ## Framework
 
@@ -43,11 +51,7 @@ $$
 The segmentation loss combines Dice loss and Binary Cross-Entropy:
 
 $$
-\mathcal{L}_{seg}
-=
-\frac{1}{2}\mathcal{L}_{Dice}
-+
-\frac{1}{2}\mathcal{L}_{BCE}
+\mathcal{L}_{seg} = \frac{1}{2}\mathcal{L}_{Dice} + \frac{1}{2}\mathcal{L}_{BCE}
 $$
 
 ### 2. Classification Head
@@ -57,9 +61,7 @@ The Classification Head (CH) is attached to the encoder bottleneck to provide ad
 The classification loss is:
 
 $$
-\mathcal{L}_{cls}
-=
-BCE(\hat{c},c)
+\mathcal{L}_{cls} = BCE(\hat{c}, c)
 $$
 
 where $c$ represents the image-level target derived from the segmentation mask.
@@ -77,22 +79,15 @@ Anatomical priors are used to estimate spatial prediction uncertainty.
 The uncertainty map is defined as:
 
 $$
-U
-=
-\frac{1}{M}
-\sum_{i=1}^{M}
-w_i
-\left|
-\bar{y}_i-y^*
-\right|
+U = \frac{1}{M}\sum_{i=1}^{M} w_i \left| \bar{y}_i - y^* \right|
 $$
 
 where:
 
-- $\bar{y}_i$ represents the retrieved anatomical prior segmentations.
-- $y^*$ represents the predicted segmentation.
-- $w_i$ represents the similarity-based weight assigned to the $i$-th anatomical prior.
-- $M$ is the number of retrieved anatomical priors.
+- $\bar{y}_i$ — the retrieved anatomical prior segmentations
+- $y^*$ — the predicted segmentation
+- $w_i$ — the similarity-based weight assigned to the $i$-th anatomical prior
+- $M$ — the number of retrieved anatomical priors
 
 Higher uncertainty indicates greater disagreement between the predicted segmentation and anatomically plausible segmentations.
 
@@ -101,14 +96,7 @@ Higher uncertainty indicates greater disagreement between the predicted segmenta
 Average Calibration Error (ACE) measures the difference between predicted confidence and observed accuracy:
 
 $$
-ACE
-=
-\frac{1}{CM}
-\sum_{c=1}^{C}
-\sum_{m=1}^{M}
-\left|
-o_{cm}-e_{cm}
-\right|
+ACE = \frac{1}{CM}\sum_{c=1}^{C}\sum_{m=1}^{M} \left| o_{cm} - e_{cm} \right|
 $$
 
 where $o_{cm}$ represents the observed accuracy and $e_{cm}$ represents the expected confidence for class $c$ and confidence bin $m$.
@@ -116,44 +104,30 @@ where $o_{cm}$ represents the observed accuracy and $e_{cm}$ represents the expe
 The regional calibration loss is:
 
 $$
-\mathcal{L}_{ACE}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left|
-u_i-e_i
-\right|
+\mathcal{L}_{ACE} = \frac{1}{N}\sum_{i=1}^{N} \left| u_i - e_i \right|
 $$
 
 where $u_i$ is the predicted uncertainty and $e_i$ is the corresponding segmentation error.
+
+---
 
 ## Overall Objective
 
 The complete framework combines segmentation, classification, CAM, and calibration objectives:
 
 $$
-\mathcal{L}_{total}
-=
-\mathcal{L}_{seg}
-+
-\lambda_{cls}\mathcal{L}_{cls}
-+
-\lambda_{CAM}\mathcal{L}_{CAM}
-+
-\lambda_{ACE}\mathcal{L}_{ACE}
+\mathcal{L}_{total} = \mathcal{L}_{seg} + \lambda_{cls}\mathcal{L}_{cls} + \lambda_{CAM}\mathcal{L}_{CAM} + \lambda_{ACE}\mathcal{L}_{ACE}
 $$
 
 The experimental loss weights are:
 
 $$
-\lambda_{cls}=0.2,
-\qquad
-\lambda_{CAM}=0.3,
-\qquad
-\lambda_{ACE}=0.5
+\lambda_{cls} = 0.2, \qquad \lambda_{CAM} = 0.3, \qquad \lambda_{ACE} = 0.5
 $$
 
 Different ablation configurations selectively add or remove **CH, CAM, and ACE** to study their individual and combined contributions.
+
+---
 
 ## Evaluation
 
@@ -172,6 +146,8 @@ Qualitative analysis includes:
 - Segmentation predictions
 - Class Activation Maps
 - Uncertainty maps
+
+---
 
 ## Project Structure
 
@@ -211,3 +187,4 @@ CAM_CH_medseg/
 ├── run_all.py
 ├── requirements.txt
 └── README.md
+```
