@@ -1,6 +1,6 @@
 # Uncertainty-Aware Deep Learning Framework for Classification-Guided Medical Image Segmentation
 
-PyTorch implementation of a unified framework for **medical image segmentation, explainability, and uncertainty estimation**.
+Implementation of a unified framework for **medical image segmentation, explainability, and uncertainty estimation**.
 
 The framework integrates:
 
