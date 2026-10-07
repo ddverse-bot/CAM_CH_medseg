@@ -15,11 +15,40 @@ The framework integrates:
 
 <img width="1313" height="800" alt="Framework architecture diagram" src="https://github.com/user-attachments/assets/4da27f58-6067-40ac-9fb8-7c02b0627f08" />
 
-The framework is evaluated using:
+## Architectures and Comparison Methods
 
-- U-Net
-- U-Net++
-- Attention U-Net
+The proposed framework is systematically evaluated using three primary
+U-Net-based segmentation backbones:
+
+- **U-Net**
+- **U-Net++**
+- **Attention U-Net**
+
+These backbones are used for the systematic evaluation of the
+Classification Head (CH), Class Activation Mapping (CAM), and Average
+Calibration Error (ACE) components.
+
+### State-of-the-Art Comparison
+
+To evaluate the competitiveness of the proposed framework against recent
+medical image segmentation methods, additional state-of-the-art (SOTA)
+methods are included as comparison baselines:
+
+- **nnU-Net** — self-configuring biomedical image segmentation framework
+- **nnU-Net (ResEnc)** — residual-encoder configuration of nnU-Net
+- **MedNeXt** — modern convolutional architecture for medical image
+  segmentation
+- **RWKV-UNet** — long-range-context medical image segmentation architecture
+- **SAM-Mix** — Segment Anything-based medical image segmentation method
+- **NACL** — calibration-aware segmentation method
+
+The primary U-Net-based backbones are used for the CH, CAM, and ACE
+ablation experiments. The additional SOTA methods are included as broader
+comparison baselines on the datasets for which results are reported in the
+manuscript.
+
+Detailed information about the SOTA comparison methods and their
+references is provided in [`SOTA.md`](SOTA.md).
 
 ---
 
